@@ -55,74 +55,23 @@ def parse_option():
 
     # easy config modification
     parser.add_argument('--batch-size', type=int, help="batch size for single GPU",default=16)
-    parser.add_argument('--data-path', type=str, help='path to dataset'
-                        ,default='/home/wcy/data/wcy86/harricane/data/envf+paki+tai')
-                        # ,default='/home/wcy/data/wcy86/harricane/data/pakiflood_clip')
+    parser.add_argument('--data-path', type=str, help='path to dataset')
     parser.add_argument('--zip', action='store_true', help='use zipped dataset instead of folder dataset')
     parser.add_argument('--cache-mode', type=str, default='part', choices=['no', 'full', 'part'],
                         help='no: no cache, '
                              'full: cache all data, '
                              'part: sharding the dataset into nonoverlapping pieces and only cache one piece')
     parser.add_argument('--pretrained',
-                        help='pretrained weight from checkpoint, could be imagenet22k pretrained weight'
-                        # )
-                        # ,default='/exstorage/wcy/harricane/code/1-Swin-Transformer-main/pretrained/swin_base_patch4_window7_224.pth')
-                        #  ,default='/exstorage/wcy/output/swin_base_patch4_window7_224_newset2_6b_1025/default/ckpt_epoch_66.pth')
-                        # ,default='/home/wcy/data/wcy86/output/swin_base_patch4_window7_224_newset_6b_1028_0/default/ckpt_epoch_55.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/swin_base_patch4_window7_224_paki_6b_0301_5/default/ckpt_epoch_50.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/swin_base_patch4_window7_224_paki_6b_0307_6_1/default/ckpt_epoch_29.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0324_1/default/ckpt_epoch_13.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_jnonly_6b_0613/default/ckpt_epoch_68.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/pretrained/vgg16-397923af.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0328_1/default/ckpt_epoch_77.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_3b_0331_1/default/ckpt_epoch_22.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0408_1_mixonly/default/ckpt_epoch_78.pth')
-                        # ,default='/home/wcy/.cache/torch/hub/checkpoints/resnext50_32x4d-7cdf4587.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0328_6/default/ckpt_epoch_66.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0410_1_mixoonly/default/ckpt_epoch_27.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_CF_PKTAI/default/ckpt_epoch_2.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_CFP_PKTAI_2/default/ckpt_epoch_47.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_tai_build_0922/default/ckpt_epoch_10.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_envpakitai_1014/default/ckpt_epoch_8.pth')
-                        ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_envpakitai_1018/default/ckpt_epoch_13.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/pretrained/densenet121-a639ec97.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/vgg_224_paki_6b_1113_2/default/ckpt_epoch_87.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/pretrained/googlenet-1378be20.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputgoogle_pakitai_1113/default/ckpt_epoch_57.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputdense_pakitai_1113_3/default/ckpt_epoch_54.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputpcpvt_pakitai_1115/default/ckpt_epoch_69.pth')
-                        # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputcfpswint_lcpakitai_1126/default/ckpt_epoch_14.pth')
-    parser.add_argument('--resume', help='resume from checkpoint'
-    # )
-    #,default='/home/wcy/data/wcy86/output/swin_base_patch4_window7_224_newset_6b_1025/default/ckpt_epoch_26.pth')
-    # ,default="/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/swin_base_patch4_window7_224_paki_6b_0307_6_1/default/ckpt_epoch_21.pth")
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0328_6/default/ckpt_epoch_66.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0408_1/default/ckpt_epoch_2.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0410_6_pyonly/default/ckpt_epoch_17.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0410_1_mixonly/default/ckpt_epoch_17.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0328_6/default/ckpt_epoch_66.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_paki_6b_0410_1_mixoonly/default/ckpt_epoch_27.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_CFP_PKTAI_3/default/ckpt_epoch_2.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_swint_taionly_0717/default/ckpt_epoch_70.pth')
-    ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_CFP_PKTAI_3/default/ckpt_epoch_60.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_CFP_PKTAI_3/default/ckpt_epoch_37.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_envpakitai_1014/default/ckpt_epoch_8.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_envpakitai_1018/default/ckpt_epoch_13.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputcfpswint_lcpakitai_1126/default/ckpt_epoch_13.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/vgg_224_paki_6b_0308_2/default/ckpt_epoch_71.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputgoogle_pakitai_1113_2/default/ckpt_epoch_68.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputdense_pakitai_1109/default/ckpt_epoch_0.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputdense_pakitai_1113/default/ckpt_epoch_70.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputt2t_pakitai_1114_2/default/ckpt_epoch_6.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputcfpswint_envpakitai_1127/default/ckpt_epoch_0.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputcfpswint_dempakitai_1126/default/ckpt_epoch_14.pth')
-    # ,default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputswin_base_patch4_window7_224_SWINT_FP_PKTAI_1/default/ckpt_epoch_75.pth')
+                        help='pretrained weight from checkpoint, could be imagenet22k pretrained weight')
+                        
+    parser.add_argument('--resume', help='resume from checkpoint')
+    
     parser.add_argument('--accumulation-steps', type=int, help="gradient accumulation steps")
     parser.add_argument('--use-checkpoint', action='store_true',
                         help="whether to use gradient checkpointing to save memory")
     parser.add_argument('--amp-opt-level', type=str, default='O1', choices=['O0', 'O1', 'O2'],
                         help='mixed precision opt level, if O0, no amp is used')
-    parser.add_argument('--output', default='/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/', type=str, metavar='PATH',
+    parser.add_argument('--output', default='./output/', type=str, metavar='PATH',
                         help='root of output folder, the full path is <output>/<model_name>/<tag> (default: output)')
     parser.add_argument('--tag', help='tag of experiment')
     parser.add_argument('--eval',action='store_true', help='Perform evaluation only')
@@ -154,8 +103,7 @@ def main(config):
     # 't2t_vit_14', pretrained=False, num_classes=4, drop_rate=0, drop_connect_rate=None, drop_path_rate=0.1, 
     # drop_block_rate=None, global_pool=None, bn_tf=False, bn_momentum=None, bn_eps=None,checkpoint_path='', img_size=224)
     # load_for_transfer_learning(model, '/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/outputt2t_pakitai_1114_2/default/ckpt_epoch_0.pth', use_ema=True, strict=False, num_classes=4)
-    # model = create_model(
-    # 'pcpvt_base_v0', pretrained=False)
+    # model = create_model('pcpvt_base_v0', pretrained=False)
     
     model.cuda()
     logger.info(str(model))
@@ -176,12 +124,11 @@ def main(config):
 
     if config.AUG.MIXUP > 0.:
         # smoothing is handled with mixup label transform
-        # torch.Tensor(config.TRAIN.LOSS_WEIGHT)/torch.Tensor(config.TRAIN.LOSS_WEIGHT).mean()
         criterion = SoftTargetCrossEntropy(weight=torch.Tensor(config.TRAIN.LOSS_WEIGHT).cuda())
     elif config.MODEL.LABEL_SMOOTHING > 0.:
         criterion = LabelSmoothingCrossEntropy(smoothing=config.MODEL.LABEL_SMOOTHING)
     else:
-        criterion = torch.nn.CrossEntropyLoss( weight=torch.Tensor(config.TRAIN.LOSS_WEIGHT).cuda())#weight=[2,1,2,1]
+        criterion = torch.nn.CrossEntropyLoss(weight=torch.Tensor(config.TRAIN.LOSS_WEIGHT).cuda())
         print(config.TRAIN.LOSS_WEIGHT)
     max_accuracy = 0.0 
 
@@ -249,19 +196,11 @@ def train_one_epoch(config, model, criterion, data_loader, optimizer, epoch, mix
     for idx, (samples, targets,fn) in enumerate(data_loader):
         samples = samples.cuda(non_blocking=True)
         targets = targets.cuda(non_blocking=True)
-        # bs,_,_,_=samples.shape
-        # I=[[int(i.split('.')[0].split('x')[-1].split('_y')[0]),int(i.split('.')[0].split('x')[1].split('_y')[1].split('_')[0])] for i in fn]
-        # I=np.array(I)
-        # B=((I.reshape(bs,-1,1) & (2**np.arange(8))) != 0).astype(int)
-        # pos=torch.tensor(B).cuda(non_blocking=True)
         if mixup_fn is not None:
             samples, targets = mixup_fn(samples, targets)
-        if config.MODEL.TYPE == 'capsnet':
-            _,outputs = model(samples)
-        else:
-            outputs = model(samples)
-            # outputs = model(samples,pos)
-            # outputs=sum(outputs)/ len(outputs)
+        
+        outputs = model(samples)
+            
 
         if config.TRAIN.ACCUMULATION_STEPS > 1:
             loss = criterion(outputs, targets)
@@ -285,8 +224,7 @@ def train_one_epoch(config, model, criterion, data_loader, optimizer, epoch, mix
                 optimizer.zero_grad()
                 lr_scheduler.step_update(epoch * num_steps + idx)
         else:
-            # weight=torch.Tensor(config.TRAIN.LOSS_WEIGHT).cuda()
-            loss = criterion(outputs, targets)#[24,4] 
+            loss = criterion(outputs, targets)
             acc1, acc2 = accuracy4train(outputs, targets, topk=(1, 2))
             optimizer.zero_grad()
             if config.AMP_OPT_LEVEL != "O0":
@@ -362,14 +300,6 @@ def validate(config, data_loader, model):
     criterion = torch.nn.CrossEntropyLoss()
     model.eval()
     
-    # img=torch.randn((1,6,224,224)).cuda()
-    # start = time.time()
-    # for i in range(500):
-    #     model(img)
-    # end = time.time()
-    # t_all=end-start
-    # print(t_all,t_all/500)
-
     batch_time = AverageMeter()
     loss_meter = AverageMeter()
     acc1_meter = AverageMeter()
@@ -378,38 +308,21 @@ def validate(config, data_loader, model):
     acc4minor_meter = AverageMeter()
     acc4major_meter = AverageMeter()
     acc4destr_meter = AverageMeter()
-    # bn1=0
-    # bn2=0
-    # bn3=0
-    # bn4=0
-    # c1=0
-    # c2=0
-    # c3=0
-    # c4=0
-    os.makedirs('/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/'+config.MODEL.NAME+'/default',exist_ok=True)
-    f=open('/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output/'+config.MODEL.NAME+'/default/test_pred.csv','w')
+
+    os.makedirs('./output/'+config.MODEL.NAME+'/default',exist_ok=True)
+    f=open('./output/'+config.MODEL.NAME+'/default/test_pred.csv','w')
     f.writelines('fn,target,pred\n')
     end = time.time()
     for idx, (images, target,fn) in enumerate(data_loader):
         images = images.cuda(non_blocking=True)
         target = target.cuda(non_blocking=True)
-        # bs,_,_,_=images.shape
-        # I=[[int(i.split('.')[0].split('x')[1].split('_y')[0]),int(i.split('.')[0].split('x')[1].split('_y')[1].split('_')[0])] for i in fn]
-        # I=np.array(I)
-        # B=((I.reshape(bs,-1,1) & (2**np.arange(8))) != 0).astype(int)
-        # pos=torch.tensor(B).cuda(non_blocking=True)
+        
         # compute output
-        if config.MODEL.TYPE=="capsnet":
-            _,output = model(images)
-        else:
-            output = model(images)
-            # output = model(images,pos)
+        output = model(images)
         b,p=output.topk(2, 1, True, True)
         for n in zip(fn,target,p):
             f.writelines(n[0]+','+str(n[1])+','+str(n[2][0])+'\n')
 
-        # if target.sum()>0:
-        #     print(111)
         # measure accuracy and record loss
         loss = criterion(output, target)
         acc1, acc5 = accuracy(output, target, topk=(1, 2))
@@ -417,14 +330,7 @@ def validate(config, data_loader, model):
         acc4minor,bs4minor = accuracy4class(output, target,1)
         acc4major,bs4major = accuracy4class(output, target,2)
         acc4destr,bs4destr = accuracy4class(output, target,3)
-        # bn1+=bs4nodam
-        # bn2+=bs4minor
-        # bn3+=bs4major
-        # bn4+=bs4destr
-        # c1+=acc4nodam.cpu().numpy()*bs4nodam
-        # c2+=acc4minor.cpu().numpy()*bs4nodam
-        # c3+=acc4major.cpu().numpy()*bs4nodam
-        # c4+=acc4destr.cpu().numpy()*bs4nodam
+
         acc1 = reduce_tensor(acc1)
         acc5 = reduce_tensor(acc5)
         loss = reduce_tensor(loss)
@@ -492,8 +398,8 @@ def throughput(data_loader, model, logger):
         return
 
 def test(config,data_loader,model):
-    os.makedirs('/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output'+config.MODEL.NAME+'/default',exist_ok=True)
-    f=open('/home/wcy/data/wcy86/harricane/code/1-Swin-Transformer-main/output'+config.MODEL.NAME+'/default/test_pred.csv','w')
+    os.makedirs('./output'+config.MODEL.NAME+'/default',exist_ok=True)
+    f=open('./output'+config.MODEL.NAME+'/default/test_pred.csv','w')
     f.writelines('fn,target,pred\n')
     end = time.time()
     for idx, (images, target,fn) in enumerate(data_loader):
@@ -510,7 +416,6 @@ def test(config,data_loader,model):
             f.writelines(n[0]+','+str(n[1])+','+str(n[2])+'\n')
 
 if __name__ == '__main__':
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "1,0" 
     _, config = parse_option()
 
     if config.AMP_OPT_LEVEL != "O0":
@@ -521,8 +426,6 @@ if __name__ == '__main__':
         world_size = int(os.environ['WORLD_SIZE'])
         print(f"RANK and WORLD_SIZE in environ: {rank}/{world_size}")
     else:
-        # rank = -1
-        # world_size = -1
         rank = 0
         world_size = 1
     torch.cuda.set_device(config.LOCAL_RANK)
