@@ -151,29 +151,13 @@ def load_pretrained(config, model, logger):
     #         del state_dict['head.bias']
     #         logger.warning(f"Error in loading classifier head, re-init classifier head to 0")
 
-
+    # This needs to be modified as needed
     sd = list(state_dict.keys()).copy()
     for k in sd:
-        # for transformer
         if "module." != k[:7]:
             k1="module."+k
-        #for vgg
-        # if "conv_layers." != k[:12] and "features." == k[:9]:
-        #     k1="conv_layers."+k[9:]
-        # for resnet
-        # k1=k
         else:
             k1=k
-        # for transformer
-        # if k in model.state_dict().keys():
-        #     if state_dict[k].shape!= model.state_dict()[k].shape:
-        #         state_dict.pop(k)
-        #     else:
-        #         state_dict[k1] = state_dict[k]
-        #         state_dict.pop(k)
-        # else:
-        #     state_dict.pop(k)
-        # for vgg
         if k in model.state_dict().keys():
             if state_dict[k].shape!= model.state_dict()[k].shape:
                 state_dict.pop(k)
@@ -182,25 +166,7 @@ def load_pretrained(config, model, logger):
                 state_dict.pop(k)
         else:
             state_dict.pop(k)
-        # for densenet
-        # g=k1.split('.')
-        # if len(g[-2])>1:
-        #     key=k1
-        # else:
-        #     key=''
-        #     for i in range(len(g)-2):
-        #         key+=g[i]+'.'
-        #     key=key[:-1]+g[-2]+'.'+g[-1]
-        # if key[7:] in model.state_dict().keys():
-        #     if state_dict[k].shape!= model.state_dict()[key[7:]].shape:
-        #         state_dict.pop(k)
-        #     else:
-                
-        #         state_dict[key] = state_dict[k]
-        #         state_dict.pop(k)
-        # else:
-        #     state_dict.pop(k)
-
+        
     msg = model.load_state_dict(state_dict, strict=False)
     logger.warning(msg)
 
