@@ -209,28 +209,7 @@ class WindowAttention(nn.Module):
 
         trunc_normal_(self.relative_position_bias_table, std=.02)
         self.softmax = nn.Softmax(dim=-1)
-    
-    # def f2(self, x, mask=None):
-    #     B, N, C = x.shape # 4*8*8,7*7,128
-    #     qkv = self.qkv_band(x).reshape(B, N, 3, self.num_heads, C // self.num_heads)
-    #     qkv = qkv.permute(2, 0, 3, 1, 4)
-    #     q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
-    #     # 4*8*8, 4, 7*7, 128/4
-    #     q = q.transpose(-2, -1)
-    #     # 4*8*8, 4, 32, 49
-    #     k = k.transpose(-2, -1)
-    #     v = v.transpose(-2, -1)
-
-    #     q = torch.nn.functional.normalize(q, dim=-1)
-    #     k = torch.nn.functional.normalize(k, dim=-1)
-
-    #     attn = (q @ k.transpose(-2, -1)) * self.temperature # 4*8*8,4,32,32
-    #     attn = attn.softmax(dim=-1)
-    #     attn = self.attn_drop(attn)
-
-    #     x = (attn @ v).permute(0, 3, 1, 2).reshape(B, N, C)
-    #     return x
-        
+            
     def forward(self, x, mask=None):
         """
         Args:
@@ -413,7 +392,6 @@ class SwinTransformerBlock(nn.Module):
         shortcut = x
         x = self.norm1(x)
         x = x.view(B, H, W, C)#4,56,56,128
-        # x = self.se(x.permute(0,3,1,2)).permute(0,2,3,1)
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = torch.roll(x, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2))
@@ -438,8 +416,6 @@ class SwinTransformerBlock(nn.Module):
             x = shifted_x
         x = x.view(B, H * W, C) #4,3136,128
 
-        # # ATTENTION
-        # x = self.Att(g=shortcut.view(B, H, W, C).permute(0,3,1,2),x=x.view(B, H, W, C).permute(0,3,1,2)).view(B, C, H * W).permute(0,2,1)
         # FFN
         x = shortcut + self.drop_path(x) #4,3136,128
         x = x + self.drop_path(self.mlp(self.norm2(x)))
@@ -732,11 +708,7 @@ class BasicLayer(nn.Module):
                 x = checkpoint.checkpoint(blk, x)
             else:
                 x = blk(x)
-        # pama模块
-        # b,_,c=x.size()# 4 3136,128
-        # x_h = self.pama(x[:,:,int(c/2):],x[:,:,:int(c/2)]).permute(0,2,3,1)
-        # x=torch.cat([x[:,:,:int(c/2)],x_h.reshape(b,-1,int(c/2))],dim=2)
-        #---------   
+
         if self.downsample is not None:
             x = self.downsample(x)
         return x
@@ -920,6 +892,7 @@ class SwinTransformer(nn.Module):
         ape (bool): If True, add absolute position embedding to the patch embedding. Default: False
         patch_norm (bool): If True, add normalization after patch embedding. Default: True
         use_checkpoint (bool): Whether to use checkpointing to save memory. Default: False
+        old (int): value in [1-9] control the SWINT variants
     """
 
     def __init__(self, img_size=224, patch_size=4, in_chans=3, num_classes=1000,
@@ -1075,13 +1048,7 @@ class SwinTransformer(nn.Module):
         self.crossmix_front=Cross_mix(3,224)
         self.conv_downsampling = nn.Conv2d(3,3,kernel_size=2,stride=2)
         pos_dim=8
-        # self.pos_conv=nn.Conv1d(2,pos_dim,1)
-        # self.pos_mlp=Mlp(pos_dim*8, 64,4,drop=0.1)
-        # self.pos_norm = nn.BatchNorm1d(pos_dim)
-        # self.pos_act=nn.ReLU()
-        # self.pos_drop2 = nn.Dropout(p=0.1)
         self.att01=Attention_block(6,1,4)
-        # self.att01=Attention_block(6,2,4)
         
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -1105,19 +1072,9 @@ class SwinTransformer(nn.Module):
         if self.ape:
             x = x + self.absolute_pos_embed
         x = self.pos_drop(x) # x:[4,3136,128]
-        '''
-        # pama模块
-        b,_,c=x.size()# 4 3136,128
-        x_h = self.pama(x[:,:,int(c/2):],x[:,:,:int(c/2)]).permute(0,2,3,1)
-        x=torch.cat([x[:,:,:int(c/2)],x_h.reshape(b,-1,int(c/2))],dim=2)
-        ''' 
-        i=0
+
         for layer in self.layers:
             x = layer(x) #torch.Size([16, 784, 256]) 3,4th 16,49,1024
-            # B,L_temp,C=x.shape
-            # L_temp= int(np.sqrt(L_temp)) # 16,28,28,128
-            # x = self.mix_layers[i](x[:,:,:C//2].reshape((B,L_temp,L_temp,C//2)),x[:,:,(C//2):].reshape((B,L_temp,L_temp,C//2))).reshape((B,-1,C))#12, 49, 2048
-            i+=1
 
         x = self.norm(x)  # B L C 形状不变  12,49,1024
         x = self.avgpool(x.transpose(1, 2))  # B C 1
@@ -1135,15 +1092,11 @@ class SwinTransformer(nn.Module):
         if self.ape:
             x = x + self.absolute_pos_embed
         x = self.pos_drop(x) # x:[4,3136,128]
-        # pama模块
-        # b,_,c=x.size()# 4 3136,128
-        # x_h = self.pama(x[:,:,int(c/2):],x[:,:,:int(c/2)]).permute(0,2,3,1)
-        # x=torch.cat([x[:,:,:int(c/2)],x_h.reshape(b,-1,int(c/2))],dim=2)
-        #---------
+
         for layer in self.layers:
             x = layer(x) #
 
-        x = self.norm(x)  # B L C 形状不变
+        x = self.norm(x)  # B L C 
         x = self.avgpool(x.transpose(1, 2))  # B C 1
         x = torch.flatten(x, 1) #
         return x
@@ -1160,15 +1113,11 @@ class SwinTransformer(nn.Module):
         if self.ape:
             x = x + self.absolute_pos_embed
         x = self.pos_drop(x) # x:[4,3136,128]
-        # pama模块
-        # b,_,c=x.size()# 4 3136,128
-        # x_h = self.pama(x[:,:,int(c/2):],x[:,:,:int(c/2)]).permute(0,2,3,1)
-        # x=torch.cat([x[:,:,:int(c/2)],x_h.reshape(b,-1,int(c/2))],dim=2)
-        #---------
+
         for layer in self.layers:
             x = layer(x) #
 
-        x = self.norm(x)  # B L C 形状不变
+        x = self.norm(x)  # B L C 
         x = self.avgpool(x.transpose(1, 2))  # B C 1
         x = torch.flatten(x, 1) #
         return x
@@ -1182,7 +1131,7 @@ class SwinTransformer(nn.Module):
         for layer in self.layers:
             x = layer(x) #
 
-        x = self.norm(x)  # B L C 形状不变
+        x = self.norm(x)  # B L C 
         # x = self.avgpool(x.transpose(1, 2))  # B C 1
         # x = torch.flatten(x, 1) #
         return x
@@ -1208,8 +1157,8 @@ class SwinTransformer(nn.Module):
             x2=x3[:,:,C1//2:]
             i+=1
         
-        x1 = self.norm(x1)  # B L C 形状不变
-        x2 = self.norm(x2)  # B L C 形状不变
+        x1 = self.norm(x1)  # B L C 
+        x2 = self.norm(x2)  # B L C 
         x = torch.cat([x1,x2],dim=2)#[12, 49, 2048]
         x = self.avgpool(x.transpose(1, 2))  # B C 1 [12, 2048, 1]
         x = torch.flatten(x, 1) #[12, 2048] 
@@ -1238,21 +1187,15 @@ class SwinTransformer(nn.Module):
             x=feat_list[i]
             norm=self.norm[i]
             head=self.head[i]
-            # heada=self.head_a[i]
-            x = norm(x)  # B L C 形状不变
+
+            x = norm(x)  # B L C 
             x = self.avgpool(x.transpose(1, 2))  # B C 1 [12, 2048, 1]
             x = torch.flatten(x, 1) #[12, 512] 
             for_tsne.append(x)
             res_list.append(head(x))# x:16 256
-            # res_list_a.append(heada(x))# x:16 256
 
-            
-        # res_list=torch.stack(res_list,dim=0)
-        # x,_ = torch.max(res_list,dim=0) 
+
         x=sum(res_list)/ len(res_list)
-        # x_a=sum(res_list_a)/ len(res_list_a)
-        # x=(x+x_a).softmax(dim=1)
-        # x=(x+x_a)/2
         return x
     
     def forward_features_old6_2(self, x):# x:[4,3,224,224]
@@ -1282,27 +1225,19 @@ class SwinTransformer(nn.Module):
             w=int(np.sqrt(S))
             feat_list.append(com(torch.cat((f1,f2),2).view(B,w,w,2*C).permute(0,3,1,2)).permute(0,2,3,1).view(B,-1,C))
         res_list=[]
-        # res_list_a=[]
         for_tsne=[]
         for i in range(len(feat_list)):
             x=feat_list[i]
             norm=self.norm[i]
             head=self.head[i]
-            # heada=self.head_a[i]
-            x = norm(x)  # B L C 形状不变
+
+            x = norm(x)  # B L C 
             x = self.avgpool(x.transpose(1, 2))  # B C 1 [12, 2048, 1]
             x = torch.flatten(x, 1) #[12, 512] 
             for_tsne.append(x)
             res_list.append(head(x))# x:16 256
-            # res_list_a.append(heada(x))# x:16 256
 
-            
-        # res_list=torch.stack(res_list,dim=0)
-        # x,_ = torch.max(res_list,dim=0) 
         x=sum(res_list)/ len(res_list)
-        # x_a=sum(res_list_a)/ len(res_list_a)
-        # x=(x+x_a).softmax(dim=1)
-        # x=(x+x_a)/2
         return x
         
     def forward_features_old6_3(self, x):# x:[4,3,224,224]
@@ -1321,13 +1256,11 @@ class SwinTransformer(nn.Module):
             x=feat_list[i]
             norm=self.norm[i]
             head=self.head[i]
-            x = norm(x)  # B L C 形状不变
+            x = norm(x)  # B L C 
             x = self.avgpool(x.transpose(1, 2))  # B C 1 [12, 2048, 1]
             x = torch.flatten(x, 1) #[12, 512] 
             res_list.append(head(x))# x:16 256
             
-        # res_list=torch.stack(res_list,dim=0)
-        # x,_ = torch.max(res_list,dim=0) 
         x=sum(res_list)/ len(res_list)
         return x
 
@@ -1390,13 +1323,12 @@ class SwinTransformer(nn.Module):
             feat_list.append(x)
             
         res_list=[]
-        # res_list_a=[]
         for_tsne=[]
         for i in range(len(feat_list)):
             x=feat_list[i]
             norm=self.norm[i]
             head=self.head[i]
-            # heada=self.head_a[i]
+
             x = norm(x)  # B L C 形状不变
             x = self.avgpool(x.transpose(1, 2))  # B C 1 [12, 2048, 1]
             x = torch.flatten(x, 1) #[12, 512] 
@@ -1430,19 +1362,8 @@ class SwinTransformer(nn.Module):
         elif self.old==5:
             x = self.forward_features_old5(x)
         elif self.old==6:
-            # _,C,_,_ = x.shape
-            # f1 = self.forward_features_old6(x[:,:6])
-            # if C==8:
-            #     env_factor=x[:,6:8]# all
-            #     # env_factor=x[:,6:7] #dem
-            #     # env_factor=x[:,7:8]#lc
-            #     psi=self.att01(env_factor,x[:,:6])
-            #     x=x[:,:6]*psi
-            # f2 = self.forward_features_old6(x)
-            # x=(f1+f2)/2
-
-            x = self.forward_features_old6_3(x[:,:6])
-            # x = self.forward_features_old6(x[:,:6])
+            # x = self.forward_features_old6_3(x[:,:6])
+            x = self.forward_features_old6(x[:,:6])
         elif self.old==7:
             x = self.forward_features_old7(x[:,:6])
         elif self.old==8:
