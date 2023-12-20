@@ -1,7 +1,7 @@
 # CFP-SwinT: Building Damage Classification during Floods using Cross Fusion Pyramid Swin-T
 
 ## Clip
-The code for data slicing can be found in the preprocesses folder
+The code for data slicing can be found in crop.py
 ## Used pretrained weight
     pretrained/81.5_T2T_ViT_14.pth.tar
     pretrained/densenet121-a639ec97.pth
