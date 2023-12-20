@@ -1,0 +1,33 @@
+DATA:
+  DATASET: xbd
+  IMG_SIZE: 224
+MODEL:
+  TYPE: swin
+  NAME: outputcfpswint_envpakitai_1127
+  SWIN:
+    EMBED_DIM: 128
+    DEPTHS: [ 2, 2, 18, 2 ]
+    NUM_HEADS: [ 4, 8, 16, 32 ]
+    WINDOW_SIZE: 7
+    IN_CHANS: 6
+TRAIN:
+  EPOCHS: 90
+  WARMUP_EPOCHS: 5
+  WEIGHT_DECAY: 0.05
+  BASE_LR: 1.25e-6 # 4096 batch-size
+  WARMUP_LR: 1.25e-7
+  MIN_LR: 1.25e-7
+
+
+  # BASE_LR: 1.25e-5 # 4096 batch-size
+  # WARMUP_LR: 1.25e-6
+  # MIN_LR: 1.25e-6
+  # train command: 
+  # /home/zaihai/anaconda3/envs/wcytorch/bin/python -m torch.distributed.launch --nproc_per_node 1 --master_port 12345  main.py \
+  # --cfg /exstorage/wcy/harricane/code/1-Swin-Transformer-main/configs/swin_base_patch4_window7_224_xview.yaml \
+  # --pretrained /exstorage/wcy/harricane/code/1-Swin-Transformer-main/pretrained/swin_base_patch4_window7_224.pth \
+  # --data-path /exstorage/wcy/harricane/data/xbd --batch-size 4 --accumulation-steps 2 [--use-checkpoint]
+  # vali command
+# python -m torch.distributed.launch --nproc_per_node 1 --master_port 12345 main.py --eval --cfg /exstorage/wcy/harricane/code/1-Swin-Transformer-main/configs/swin_base_patch4_window7_224_abcd.yaml --resume /exstorage/wcy/harricane/code/1-Swin-Transformer-main/output/swin_base_patch4_window7_224_abcdresize_0320/default/ckpt_epoch_11.pth --data-path /exstorage/wcy/harricane/data/ABCDdataset/resized
+
+  
