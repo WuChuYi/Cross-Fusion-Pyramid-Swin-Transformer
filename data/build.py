@@ -1,29 +1,13 @@
-# --------------------------------------------------------
-# Swin Transformer
-# Copyright (c) 2021 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
-# Written by Ze Liu
-# --------------------------------------------------------
-
 import os
 import torch
 import numpy as np
 import torch.distributed as dist
 from torchvision import datasets, transforms
 # from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
-# IMAGENET_DEFAULT_MEAN = (0.485, 0.456, 0.406, 0.485, 0.456, 0.406,0.498,0.500,0.501)
-# IMAGENET_DEFAULT_STD = (0.229, 0.224, 0.225, 0.229, 0.224, 0.225,0.422,0.415,0.412)
-# IMAGENET_DEFAULT_MEAN = (0.485, 0.456, 0.406, 0.485, 0.456, 0.406)#, -0.006, 0.087, 0.101)
-# IMAGENET_DEFAULT_STD = (0.229, 0.224, 0.225, 0.229, 0.224, 0.225)#, 0.059, 0.094, 0.109)
-# newset2
-# IMAGENET_DEFAULT_MEAN = (0.268*255,0.369*255,0.328*255,0.268*255, 0.369*255, 0.328*255)
-# IMAGENET_DEFAULT_STD = (0.148*255,0.144*255,0.163*255,0.148*255, 0.144*255, 0.163*255)
-#paki
+# This needs to be modified as needed
 IMAGENET_DEFAULT_MEAN = (0.167,0.269,0.185,0.215, 0.291, 0.274)
 IMAGENET_DEFAULT_STD = (0.102,0.105,0.103,0.114, 0.125, 0.158)
-#jiangnan
-# IMAGENET_DEFAULT_MEAN = (0.139,0.151,0.116,0.274,0.302,0.300)
-# IMAGENET_DEFAULT_STD = (0.143,0.125,0.126,0.129,0.140,0.173)
+
 
 from timm.data import Mixup
 from timm.data import create_transform
@@ -117,7 +101,7 @@ def build_dataset(is_train, config):
             root = os.path.join(config.DATA.DATA_PATH, prefix)
             dataset = datasets.ImageFolder(root, transform=transform)
         nb_classes = 1000
-    elif config.DATA.DATASET == 'hurricane' or config.DATA.DATASET == 'xbd' or config.DATA.DATASET == 'abcd':
+    elif config.DATA.DATASET == 'flood':
         if is_train:
             prefix = 'train'  
         else:
@@ -130,6 +114,7 @@ def build_dataset(is_train, config):
                                         cache_mode=config.DATA.CACHE_MODE if is_train else 'part')
         else:
             root = os.path.join(config.DATA.DATA_PATH, prefix)
+            # code of ImageFolder needs to be modified for your data. The original code is only for 3-band imagery.
             dataset = datasets.ImageFolder(root, transform=transform)
         nb_classes = config.MODEL.NUM_CLASSES
     elif config.DATA.DATASET == 'imagenet22K':
@@ -143,7 +128,7 @@ def build_dataset(is_train, config):
 def build_transform(is_train, config):
     resize_im = config.DATA.IMG_SIZE > 32
     if is_train:
-        if config.DATA.DATASET == 'xbd' or config.DATA.DATASET == 'abcd':
+        if config.DATA.DATASET == 'flood':
             mean=IMAGENET_DEFAULT_MEAN
             std=IMAGENET_DEFAULT_STD
             transform = transforms.Compose([
