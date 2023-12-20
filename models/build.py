@@ -1,13 +1,5 @@
-# --------------------------------------------------------
-# Swin Transformer
-# Copyright (c) 2021 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
-# Written by Ze Liu
-# --------------------------------------------------------
-
 from .swin_transformer import SwinTransformer
 from .swin_mlp import SwinMLP
-from .capsnet import CapsNet,ReconstructionNet,CapsNetWithReconstruction
 
 
 def build_model(config):
@@ -44,13 +36,6 @@ def build_model(config):
                         ape=config.MODEL.SWIN_MLP.APE,
                         patch_norm=config.MODEL.SWIN_MLP.PATCH_NORM,
                         use_checkpoint=config.TRAIN.USE_CHECKPOINT)
-    elif model_type == 'capsnet':
-        model = CapsNet(config.routing_iterations,n_classes=4)
-
-        if config.with_reconstruction:
-            reconstruction_model = ReconstructionNet(16, 4)
-            reconstruction_alpha = 0.0005
-            model = CapsNetWithReconstruction(model, reconstruction_model)
     else:
         raise NotImplementedError(f"Unkown model: {model_type}")
 
