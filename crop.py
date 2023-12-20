@@ -11,7 +11,7 @@ def get_file_names(data_dir, file_type=None):
         file_type = ['tif', 'tiff']
     result_dir = []
     result_name = []
-    for maindir, subdir, file_name_list in os.walk(data_dir):  # disdir 为灾害事件的文件夹
+    for maindir, subdir, file_name_list in os.walk(data_dir):  
         for filename in file_name_list:
             apath = maindir + '//' + filename
             apath = apath.replace("\\", "/")
@@ -65,13 +65,13 @@ def cut(in_dir, out_dir, file_type=None, out_type='png', out_size=1024):
     print('Cut begining for ', str(len(data_dir_list)), ' images.....')
     for each_dir in data_dir_list:
         time_start = time.time()
-        # image = gdal.Open(each_dir).ReadAsArray()
 
+        # This needs to be modified as needed
+        # image = gdal.Open(each_dir).ReadAsArray()
         # image = cv2.imread(each_dir,cv2.IMREAD_GRAYSCALE)[:,:,np.newaxis]
         image = cv2.imread(each_dir)[:,:,::-1]
         # image = io.imread(each_dir)[:,:,np.newaxis]
 
-        # image = np.rot90(image, k=2, axes=(1, 2))
 
         cut_factor_row = int(np.ceil(image.shape[0] / out_size)) + 1  # 0
         cut_factor_clo = int(np.ceil(image.shape[1] / out_size)) + 1  # 1
@@ -116,6 +116,7 @@ def cut(in_dir, out_dir, file_type=None, out_type='png', out_size=1024):
                 out_dir_images = out_dir + '/' + each_dir.split('/')[-3] + '_' + each_dir.split('/')[-2] + '_' + each_dir.split('/')[-1].split('.')[0] \
                                  + '_x' + str(int(start_x / out_size)) + '_y' + str(int(start_y / out_size)) + '.' + out_type
 
+                # This needs to be modified as needed
                 # out_image = temp_image.transpose(1, 2, 0)
                 # out_image = Image.fromarray(np.uint16(temp_image[:,:,0]))
                 out_image = Image.fromarray(temp_image)
@@ -179,34 +180,11 @@ def makelist(image_dir):
 if __name__ == '__main__':
     # gdal.PushErrorHandler('CPLQuietErrorHandler')
     ##### cut
-    data_dir = 'E://work//disaster//data//20220624JiangnanFlood2//origin_png//3m'
-    # 'E://work//disaster//data//20170814NepalFlood//landcover//png'
-    # 'E://work//disaster//data//0220615PakistanFlood//dem//tif-clip'
-    # 'E://work//disaster//data//0220615PakistanFlood//landcover//png-clip'
-    # 'E://work//disaster//data//211001TailandFlood//landcover//png'
-    # 'E://work//disaster//data//s20220624//jiangnan-planet0602'
-    out_dir = 'E://work//disaster//data//20220624JiangnanFlood2//png_clip_3m'
-    # 'E://work//disaster//data//20170814NepalFlood//landcover//png-clip'
-    # 'E://work//disaster//data//0220615PakistanFlood//dem//tif-clip-224'
-    # 'E://work//disaster//data//0220615PakistanFlood//landcover//png-clip-224'
-    # 'E://work//disaster//data//211001TailandFlood//landcover//png-clip'
-    # 'E://work//disaster//data//s20220624//jiangnan-planet-clip0602'
+    data_dir = 'E://work//disaster//data//2022JiangnanFlood//'
+    out_dir = 'E://work//disaster//data//output//'
 
     file_type = ['png']
     out_type = 'png'
-    # cut_size = 896
     cut_size = 224
 
     cut(data_dir, out_dir, file_type, out_type, cut_size)
-    # makelist(out_dir)
-
-    ##### combine
-#    data_dir='F:/Level1/cut_960'
-#    h=3072
-#    w=1792
-#    c=3
-#    out_dir='F:/Level1'
-#    out_type='tif'
-#    file_type=['tif']
-#
-#    combine(data_dir, w, h, c, out_dir, out_type, file_type)
